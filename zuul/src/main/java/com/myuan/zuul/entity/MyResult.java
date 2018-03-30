@@ -1,4 +1,4 @@
-package com.myuan.user.entity;
+package com.myuan.zuul.entity;
 
 import lombok.Data;
 

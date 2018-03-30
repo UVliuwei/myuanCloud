@@ -1,4 +1,4 @@
-package com.myuan.login.utils;
+package com.myuan.zuul.utils;
 /*
  * @author liuwei
  * @date 2018/3/14 20:12

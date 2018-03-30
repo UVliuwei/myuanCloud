@@ -1,9 +1,10 @@
-package com.myuan.login.utils;
+package com.myuan.user.utils;
 /*
  * @author liuwei
  * @date 2018/3/14 20:12
  * tooken
  */
+
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
@@ -11,7 +12,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import java.io.UnsupportedEncodingException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 

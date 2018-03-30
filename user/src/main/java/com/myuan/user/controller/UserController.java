@@ -5,6 +5,7 @@ import com.google.common.base.Objects;
 import com.myuan.user.entity.MyResult;
 import com.myuan.user.entity.MyUser;
 import com.myuan.user.service.UserService;
+import com.myuan.user.utils.JWTUtil;
 import com.myuan.user.utils.SaltPasswordUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,11 +43,26 @@ public class UserController extends BaseController {
         }
         return user;
     }
+    @ApiOperation(value = "获取个人信息", notes = "获取个人信息")
+    @GetMapping("/user")
+    public MyUser getUserSelf(HttpServletRequest request) {
+        Long id = JWTUtil.getUserId(request.getHeader("token"));
+        if(id == null) {
+            return new MyUser();
+        }
+        MyUser user = userService.getUserById(id);
+        if (user != null) {
+            user.setPassword("");
+        }
+        return user;
+    }
+
     @ApiOperation(value = "name获取用户信息", notes = "name获取用户信息")
     @GetMapping("/user/name")
     public MyUser getUserByName(@RequestParam(value = "name") String name) {
         return userService.getUserByName(name);
     }
+
     @ApiOperation(value = "email获取用户信息", notes = "email获取用户信息")
     @GetMapping("/user/email")
     public MyUser getUserByEmail(@RequestParam(value = "email") String email) {
@@ -54,8 +70,8 @@ public class UserController extends BaseController {
     }
 
     @ApiOperation(value = "密码修改", notes = "密码修改")
-    @PutMapping("/user/{id}/pass")
-    public MyResult updatePass(@PathVariable("id") Long id, String oldPass, String pass, String repass) {
+    @PutMapping("/user/pass")
+    public MyResult updatePass(Long id, String oldPass, String pass, String repass) {
         if (!Objects.equal(pass, repass)) {
             return MyResult.error("两次输入的密码不一致");
         }
@@ -67,14 +83,26 @@ public class UserController extends BaseController {
         return result;
     }
 
-    @ApiOperation(value = "用户信息修改", notes = "用户信息修改")
+    @ApiOperation(value = "用户信息修改", notes = "用户信息修改(管理员)")
     @PutMapping("/user/{id}")
     public MyResult updateInfo(@PathVariable("id") Long id, String name, String sex, String province, String city, String description) {
 
         MyResult result = userService.updateUserInfo(id, name, sex, province, city, description);
         return result;
     }
-//    @ApiOperation(value = "重置密码", notes = "重置密码")
+
+    @ApiOperation(value = "用户信息修改", notes = "用户信息修改(用户)")
+    @PutMapping("/user")
+    public MyResult updateInfoSelf(String name, String sex, String province, String city, String description, HttpServletRequest request) {
+        Long id = JWTUtil.getUserId(request.getHeader("token"));
+        if(id == null) {
+            return MyResult.noLogin();
+        }
+        MyResult result = userService.updateUserInfo(id, name, sex, province, city, description);
+        return result;
+    }
+
+    //    @ApiOperation(value = "重置密码", notes = "重置密码")
 //    @PostMapping("/user/passreset")
 //    public MyResult resetPass(String email, String vercode, HttpServletRequest request) {
 //        String code = (String) request.getSession().getAttribute(Constants.KAPTCHA_SESSION_KEY);
@@ -86,10 +114,11 @@ public class UserController extends BaseController {
 //    }
     @ApiOperation(value = "增加飞吻", notes = "增加飞吻")
     @PutMapping("/user/{id}/kiss")
-    public MyResult addKiss(@PathVariable("id") Long id,@RequestParam(value = "kiss") Integer kiss) {
+    public MyResult addKiss(@PathVariable("id") Long id, @RequestParam(value = "kiss") Integer kiss) {
         MyResult result = userService.addUserKiss(id, kiss);
         return result;
     }
+
     /**
      * 注册 <liuwei> [2018/1/20 9:33]
      */

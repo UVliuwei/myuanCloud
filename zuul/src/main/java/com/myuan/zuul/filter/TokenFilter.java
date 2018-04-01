@@ -56,7 +56,7 @@ public class TokenFilter extends ZuulFilter {
             ctx.setSendZuulResponse(true); //进行路由
         } else {
             try {
-                response.setCharacterEncoding("utf-8");
+                response.setContentType("text/html;charset=UTF-8");
                 PrintWriter writer = response.getWriter();
                 writer.append(JSON.toJSONString(result));
                 ctx.setResponse(response);

@@ -34,8 +34,8 @@ public class SignController {
     @GetMapping("sign/status")
     @ApiOperation(value = "用户签到状态", notes = "用户签到状态")
     public MyResult signStatus(Long userId) {
-        signService.signStatus(userId);
-        return MyResult.ok("");
+        MyResult result = signService.signStatus(userId);
+        return result;
     }
 
     @GetMapping("sign/rank")

@@ -43,8 +43,7 @@ public class LoginController {
 
     @PostMapping("logout")
     @ApiOperation(value = "退出登录", notes = "退出登录")
-    public MyResult logout(HttpServletResponse response) {
-        response.addCookie(new Cookie("token", ""));
+    public MyResult logout() {
         return MyResult.ok("");
     }
 }

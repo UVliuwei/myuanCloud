@@ -6,7 +6,6 @@ package com.myuan.zuul.utils;
  */
 
 import com.myuan.zuul.entity.MyResult;
-import java.io.FileInputStream;
 import java.util.Properties;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
@@ -19,9 +18,6 @@ public class AuthUtil {
 
     public static MyResult checkAuth(HttpServletRequest request, String token) {
         try {
-            if (token == null) {
-                return MyResult.noLogin();
-            }
             String requestURI = request.getRequestURI().replaceFirst("/", "");
             String method = request.getMethod().toLowerCase();
             String[] strings = requestURI.split("/");
@@ -48,25 +44,35 @@ public class AuthUtil {
             ClassPathResource resource = new ClassPathResource("bootstrap.properties");
             properties = PropertiesLoaderUtils.loadProperties(resource);
         }
-        String auth = properties.getProperty(url);
-        if(StringUtils.isBlank(auth)) {
-            return MyResult.noAuth();
-        }
-        if(auth.equals("anno")) {
+        String auths = properties.getProperty(url);
+        if(StringUtils.isBlank(auths)) {
             return MyResult.ok("");
-        } else if(auth.equals("user")) {
-            if (JWTUtil.verify(token)) {
+        }
+        String[] strings = auths.split(",");
+        for (String auth : strings) {
+            if(auth.equals("anno")) {
                 return MyResult.ok("");
-            }
-            return MyResult.noLogin();
-        } else {
-            String[] roles = JWTUtil.getUserRoles(token);
-            for (String role : roles) {
-                if("admin".equals(role) || "superadmin".equals(role)) {
+            } else if(auth.equals("user")) {
+                if (token == null) {
+                    return MyResult.noLogin();
+                }
+                if (JWTUtil.verify(token)) {
                     return MyResult.ok("");
                 }
+                return MyResult.noLogin();
+            } else {
+                if (token == null) {
+                    return MyResult.noLogin();
+                }
+                String[] roles = JWTUtil.getUserRoles(token);
+                for (String role : roles) {
+                    if("admin".equals(role) || "superadmin".equals(role)) {
+                        return MyResult.ok("");
+                    }
+                }
+                return MyResult.noAuth();
             }
-            return MyResult.noAuth();
         }
+        return MyResult.noAuth();
     }
 }

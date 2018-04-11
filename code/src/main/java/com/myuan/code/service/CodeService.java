@@ -1,14 +1,17 @@
-package com.myuan.user.service;
+package com.myuan.code.service;
 
 
+import com.alibaba.fastjson.JSONObject;
 import com.google.code.kaptcha.Constants;
 import com.google.code.kaptcha.Producer;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.util.UUID;
 import javax.imageio.ImageIO;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +26,7 @@ public class CodeService {
     @Autowired
     private Producer captchaProducer;
 
-    public void createCode(HttpServletRequest request, HttpServletResponse response) {
+    public JSONObject createCode(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
 
         response.setDateHeader("Expires", 0);
@@ -40,6 +43,7 @@ public class CodeService {
         // return a jpeg
         response.setContentType("image/jpeg");
 
+
         // create the text for the image
         String capText = captchaProducer.createText();
 
@@ -49,15 +53,24 @@ public class CodeService {
         // create the image with the text
         try {
             BufferedImage bi = captchaProducer.createImage(capText);
-            ServletOutputStream out = response.getOutputStream();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
 
             // write the data out
-
             ImageIO.write(bi, "jpg", out);
             out.flush();
             out.close();
+            JSONObject object = new JSONObject();
+            object.put("img", "data:image/jpeg;base64," + Base64.encodeBase64String(out.toByteArray()));
+            object.put("codeToken", codeToken());
+            return object;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
+    }
+
+    private String codeToken() {
+        String token = UUID.randomUUID().toString();
+        return token;
     }
 }

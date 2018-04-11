@@ -1,8 +1,8 @@
-package com.myuan.user.controller;
+package com.myuan.code.controller;
 
-import com.myuan.user.service.CodeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+
+import com.alibaba.fastjson.JSONObject;
+import com.myuan.code.service.CodeService;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2018/3/1 19:03
  * code
  */
-@Api("验证码")
 @RestController
 @RequestMapping("api")
 public class CodeController {
@@ -24,9 +23,8 @@ public class CodeController {
     @Autowired
     private CodeService codeService;
 
-    @ApiOperation(value = "验证码", notes = "验证码")
-    @GetMapping("/{path}/code")
-    public void createCode(@PathVariable("path") String path, HttpServletRequest request, HttpServletResponse response) {
-        codeService.createCode(request, response);
+    @GetMapping("code/{path}")
+    public JSONObject createCode(@PathVariable("path") String path, HttpServletRequest request, HttpServletResponse response) {
+        return codeService.createCode(request, response);
     }
 }

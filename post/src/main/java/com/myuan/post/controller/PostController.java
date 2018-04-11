@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /*
- * @author liuwei
+ * @author liuweicd
  * @date 2018/2/4 9:41
  * 帖子接口层
  */
@@ -67,7 +67,7 @@ public class PostController extends BaseController {
             return MyResult.error("验证码错误");
         }
         if (bindingResult.hasErrors()) {
-            return validForm(bindingResult);
+             return validForm(bindingResult);
         }
         MyResult result = postService.editPost(post);
         return result;
@@ -78,7 +78,7 @@ public class PostController extends BaseController {
     public MyPage<UserPost> getAllPost(@PathVariable("column") String column
         , @PathVariable("value") String value
         , @PathVariable(value = "page", required = false) String page) {
-        if(StringUtils.isBlank(page) || !StringUtils.isNumeric(page)) {
+        if (StringUtils.isBlank(page) || !StringUtils.isNumeric(page)) {
             page = "1";
         }
         return postService.getAllPost(Integer.valueOf(page), 30, column, value);
@@ -92,7 +92,7 @@ public class PostController extends BaseController {
     }
 
     @GetMapping("post/{id}")
-    @ApiOperation(value = "删除求解", notes = "删除求解")
+    @ApiOperation(value = "获取求解", notes = "获取求解")
     public MyPost getPostById(@PathVariable("id") Long id) {
         return postService.getPostById(id);
     }

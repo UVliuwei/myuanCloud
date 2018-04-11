@@ -1,4 +1,4 @@
-package com.myuan.user.config;
+package com.myuan.code.config;
 /*
  * @author liuwei
  * @date 2018/3/1 18:34

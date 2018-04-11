@@ -5,9 +5,11 @@ import com.myuan.answer.entity.MyPage;
 import com.myuan.answer.entity.MyResult;
 import com.myuan.answer.service.AnswerService;
 import com.myuan.answer.entity.UserAnswer;
+import com.myuan.answer.utils.JWTUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,8 +47,8 @@ public class AnswerController {
 
     @ApiOperation(value = "未读消息条数", notes = "未读消息条数")
     @GetMapping("message/nums")
-    public MyResult messageNum(Long userId) {
-        Integer num = answerService.getMessageNums(userId);
+    public MyResult messageNum(HttpServletRequest request) {
+        Integer num = answerService.getMessageNums(JWTUtil.getUserIdByRequest(request));
         return MyResult.data(num.toString());
     }
 
@@ -60,9 +62,9 @@ public class AnswerController {
     }
 
     @ApiOperation(value = "未读消息", notes = "未读消息")
-    @GetMapping("user/{id}/messages")
-    public MyResult message(@PathVariable("id") Long id) {
-        return answerService.findUserMessage(id);
+    @GetMapping("message/user/{id}")
+    public MyResult message(@PathVariable("id") Long id, HttpServletRequest request) {
+        return answerService.findUserMessage(JWTUtil.getUserIdByRequest(request));
     }
 
     @ApiOperation(value = "获取用户回答", notes = "获取用户回答")
@@ -78,7 +80,7 @@ public class AnswerController {
     }
 
     @ApiOperation(value = "删除用户全部消息", notes = "删除用户全部消息")
-    @DeleteMapping("/user/{id}/messages")
+    @DeleteMapping("message/user/{id}")
     public MyResult deleteUserMessages(@PathVariable("id") Long id) {
         return answerService.deleteMessages(id);
     }

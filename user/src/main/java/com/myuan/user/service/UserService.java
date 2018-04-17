@@ -57,6 +57,7 @@ public class UserService {
     /**
      * 用户注册
      */
+    @Transactional
     public MyResult saveUser(MyUser user) {
         if (getUserByName(user.getName()) != null) {
             return MyResult.error("用户名已被注册");
@@ -71,10 +72,7 @@ public class UserService {
         user.setLocked("0");
         userDao.save(user);
         //点赞表
-        MyResult result = zanRemoteClient.addUserZan(user.getId());
-        if ("-1".equals(result)) {
-            throw new RuntimeException();
-        }
+        zanRemoteClient.addUserZan(user.getId());
         //签到表
         signRemoteClient.addSign(user.getId());
         log.info("用户：" + user.getName() + "注册成功");
@@ -104,6 +102,7 @@ public class UserService {
     /**
      * 更新用户信息
      */
+    @Transactional
     public MyResult updateUserInfo(Long id, String name, String sex, String province, String city, String description) {
         try {
             MyUser user = getUserByName(name);

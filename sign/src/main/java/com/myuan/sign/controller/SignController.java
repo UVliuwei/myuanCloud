@@ -3,14 +3,11 @@ package com.myuan.sign.controller;
 
 import com.myuan.sign.entity.MyResult;
 import com.myuan.sign.service.SignService;
+import com.myuan.sign.utils.JWTUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /*
  * @author liuwei
@@ -33,8 +30,8 @@ public class SignController {
 
     @GetMapping("sign/status")
     @ApiOperation(value = "用户签到状态", notes = "用户签到状态")
-    public MyResult signStatus(Long userId) {
-        MyResult result = signService.signStatus(userId);
+    public MyResult signStatus(@RequestHeader("token") String token) {
+        MyResult result = signService.signStatus(JWTUtil.getUserId(token));
         return result;
     }
 

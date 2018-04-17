@@ -88,6 +88,10 @@ public class SignService {
      */
     public MyResult signStatus(Long userId) {
         MySign sign = signDao.findByUserId(userId);
+        if(sign == null) {
+            addSign(userId);
+            sign = signDao.findByUserId(userId);
+        }
         Date date = sign.getUpdateDate();
         Calendar c1 = new GregorianCalendar();
         c1.setTime(date);

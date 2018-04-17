@@ -63,6 +63,10 @@ public class ZanService {
      */
     public void addZan(Long userId, Long answerId) {
         MyZan zan = zanDao.findByUserId(userId);
+        if(zan == null) {
+            addUserZan(userId);
+            zan = zanDao.findByUserId(userId);
+        }
         if (StringUtils.isNotBlank(zan.getAnswerIds())) {
             List<Long> idList = JSON.parseArray(zan.getAnswerIds(), Long.class);
             idList.add(answerId);
@@ -81,7 +85,7 @@ public class ZanService {
      */
     public String checkZan(Long userId, Long answerId) {
         MyZan zan = zanDao.findByUserId(userId);
-        if (StringUtils.isNotBlank(zan.getAnswerIds())) {
+        if (zan !=null && StringUtils.isNotBlank(zan.getAnswerIds())) {
             List<Long> idList = JSON.parseArray(zan.getAnswerIds(), Long.class);
             for (Long id : idList) {
                 if(id.equals(answerId)) {

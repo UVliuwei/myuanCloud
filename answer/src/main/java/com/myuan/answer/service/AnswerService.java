@@ -6,21 +6,10 @@ import com.myuan.answer.client.PostRemoteClient;
 import com.myuan.answer.client.UserRemoteClient;
 import com.myuan.answer.dao.AnswerDao;
 import com.myuan.answer.dao.ReplyDao;
-import com.myuan.answer.entity.MyAnswer;
-import com.myuan.answer.entity.MyPage;
-import com.myuan.answer.entity.MyReply;
-import com.myuan.answer.entity.MyResult;
-import com.myuan.answer.entity.MyUser;
-import com.myuan.answer.entity.UserAnswer;
+import com.myuan.answer.entity.*;
 import com.myuan.answer.utils.DateUtil;
-import com.myuan.answer.utils.UserUtil;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Pattern;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +17,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Pattern;
+
 
 /*
  * @author liuwei
@@ -136,7 +131,7 @@ public class AnswerService {
     /**
      * <liuwei> [2018/2/24 14:08] 回复分页
      */
-    public MyPage<MyAnswer> findAnswers(long postId, Integer page, Integer limit) {
+    public MyPage<MyAnswer> findAnswers(long postId, Integer page, Integer limit, long userId) {
         Sort sort = new Sort(Direction.ASC, "createDate");
         Pageable pageable = new PageRequest(page - 1, limit, sort);
         Page<MyAnswer> answers = answerDao.findMyAnswersByPostId(postId, pageable);
@@ -150,12 +145,11 @@ public class AnswerService {
             myPage.setCount(answers.getTotalElements());
             myPage.setCurrentPage(page);
             myPage.setPageNum(answers.getTotalPages());
-//            MyUser user = UserUtil.getCurrentUser();
-//            if (user != null) {
-//                for (MyAnswer answer : answers.getContent()) {
-//                    answer.setIsZan(zanService.checkZan(user.getId(), answer.getId()));
-//                }
-//            }
+            if (userId != -1l) {
+                for (MyAnswer answer : answers.getContent()) {
+                    answer.setIsZan(zanService.checkZan(userId, answer.getId()));
+                }
+            }
             myPage.setList(answers.getContent());
         }
         return myPage;
@@ -184,6 +178,7 @@ public class AnswerService {
         Page<Long> userAnswers = answerDao.findTopAnswerUsers(date, pageable);
         List<UserAnswer> userList = Lists.newArrayList();
         UserAnswer userAnswer = null;
+        System.out.println(userRemoteClient.getUser(29L));
         for (Long id : userAnswers.getContent()) {
             userAnswer = new UserAnswer();
             userAnswer.setUser(userRemoteClient.getUser(id));

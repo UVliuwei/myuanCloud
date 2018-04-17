@@ -53,9 +53,14 @@ public class AnswerController {
     @GetMapping("answer/post/{id}/answers")
     public MyPage<MyAnswer> findPostAnswers(@PathVariable("id") Long postId,
         @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
-        @RequestParam(value = "limit", required = false, defaultValue = "6") Integer limit) {
+        @RequestParam(value = "limit", required = false, defaultValue = "6") Integer limit,
+        @RequestHeader("token") String token) {
 
-        return answerService.findAnswers(postId, page, limit);
+        Long userId = -1L;
+        if(JWTUtil.verify(token)) {
+           userId = JWTUtil.getUserId(token);
+        }
+        return answerService.findAnswers(postId, page, limit, userId);
     }
 
     @ApiOperation(value = "未读消息", notes = "未读消息")

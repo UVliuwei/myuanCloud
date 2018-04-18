@@ -13,13 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /*
  * @author liuwei
@@ -45,11 +39,8 @@ public class UserController extends BaseController {
     }
     @ApiOperation(value = "获取个人信息", notes = "获取个人信息")
     @GetMapping("/user")
-    public MyUser getUserSelf(HttpServletRequest request) {
-        Long id = JWTUtil.getUserId(request.getHeader("token"));
-        if(id == null) {
-            return new MyUser();
-        }
+    public MyUser getUserSelf(@RequestHeader("token") String token) {
+        Long id = JWTUtil.getUserId(token);
         MyUser user = userService.getUserById(id);
         if (user != null) {
             user.setPassword("");
@@ -71,10 +62,11 @@ public class UserController extends BaseController {
 
     @ApiOperation(value = "密码修改", notes = "密码修改")
     @PutMapping("/user/pass")
-    public MyResult updatePass(Long id, String oldPass, String pass, String repass) {
+    public MyResult updatePass(String oldPass, String pass, String repass, @RequestHeader("token") String token) {
         if (!Objects.equal(pass, repass)) {
             return MyResult.error("两次输入的密码不一致");
         }
+        Long id = JWTUtil.getUserId(token);
         MyUser user = userService.getUserById(id);
         if (!user.getPassword().equals(SaltPasswordUtil.getNewPass(oldPass))) {
             return MyResult.error("原密码不正确");
@@ -93,8 +85,8 @@ public class UserController extends BaseController {
 
     @ApiOperation(value = "用户信息修改", notes = "用户信息修改(用户)")
     @PutMapping("/user")
-    public MyResult updateInfoSelf(String name, String sex, String province, String city, String description, HttpServletRequest request) {
-        Long id = JWTUtil.getUserId(request.getHeader("token"));
+    public MyResult updateInfoSelf(String name, String sex, String province, String city, String description, @RequestHeader("token") String token) {
+        Long id = JWTUtil.getUserId(token);
         if(id == null) {
             return MyResult.noLogin();
         }

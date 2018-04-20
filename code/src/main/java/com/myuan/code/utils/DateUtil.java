@@ -1,4 +1,4 @@
-package com.myuan.post.utils;
+package com.myuan.code.utils;
 
 
 import java.text.ParseException;
@@ -17,7 +17,6 @@ public class DateUtil {
     public static final long DAY = HOUR * 24;
 
     public static final long WEEK = DAY * 7;
-
 
     public final static String getDate(Date startTime) {
 

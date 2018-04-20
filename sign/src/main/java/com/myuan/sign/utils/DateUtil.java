@@ -11,6 +11,14 @@ import lombok.extern.log4j.Log4j;
 @Log4j
 public class DateUtil {
 
+    public static final long MINUTE = 60;
+
+    public static final long HOUR = MINUTE * 60;
+
+    public static final long DAY = HOUR * 24;
+
+    public static final long WEEK = DAY * 7;
+
     public final static String getDate(Date startTime) {
 
         long min = (new Date().getTime() - startTime.getTime()) / 1000;//除以1000转换成秒

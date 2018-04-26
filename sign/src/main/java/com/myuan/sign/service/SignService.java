@@ -53,9 +53,9 @@ public class SignService {
             kiss = 5;
         } else {
             if (DateUtil.checkDay(sign.getUpdateDate())) {
-                sign.setContinueNum(sign.getContinueNum() + 1);
+                signDao.addContinueNum(sign.getId(), sign.getContinueNum() + 1);
             } else {
-                sign.setContinueNum(1);
+                signDao.addContinueNum(sign.getId(), 1);
             }
             kiss = SwitchUtil.switchDayKiss(sign.getContinueNum());
             MyResult result = userRemoteClient.addKiss(userId, kiss);
@@ -102,8 +102,13 @@ public class SignService {
         } else {
             object.put("signed", false);
         }
-        object.put("kiss", SwitchUtil.switchDayKiss(sign.getContinueNum()));
-        object.put("days", sign.getContinueNum());
+        if (c2.get(Calendar.DATE) - c1.get(Calendar.DATE) > 1) {
+            object.put("kiss", 5);
+            object.put("days", 0);
+        } else {
+            object.put("kiss", SwitchUtil.switchDayKiss(sign.getContinueNum()));
+            object.put("days", sign.getContinueNum());
+        }
         return MyResult.data(JSON.toJSONString(object));
     }
 

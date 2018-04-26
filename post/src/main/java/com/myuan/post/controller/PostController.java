@@ -8,6 +8,7 @@ import com.myuan.post.entity.MyPost;
 import com.myuan.post.entity.MyResult;
 import com.myuan.post.entity.UserPost;
 import com.myuan.post.service.PostService;
+import com.myuan.post.service.RedisService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
@@ -38,12 +39,14 @@ public class PostController extends BaseController {
 
     @Autowired
     private PostService postService;
+    @Autowired
+    private RedisService redisService;
 
     @PostMapping("post")
     @ApiOperation(value = "发表求解", notes = "发表求解")
-    public MyResult addPost(@Valid MyPost post, BindingResult bindingResult, String vercode, HttpServletRequest request) {
-        String code = (String) request.getSession().getAttribute(Constants.KAPTCHA_SESSION_KEY);
-        if (!Objects.equal(code, vercode)) {
+    public MyResult addPost(@Valid MyPost post, BindingResult bindingResult, String vercode, String codetoken) {
+        String code = redisService.get(codetoken);
+        if(StringUtils.isBlank(codetoken) || !Objects.equal(code, vercode)) {
             return MyResult.error("验证码错误");
         }
         if (bindingResult.hasErrors()) {
@@ -61,9 +64,9 @@ public class PostController extends BaseController {
 
     @PutMapping("post")
     @ApiOperation(value = "编辑求解", notes = "编辑求解")
-    public MyResult editPost(@Valid MyPost post, BindingResult bindingResult, String vercode, HttpServletRequest request) {
-        String code = (String) request.getSession().getAttribute(Constants.KAPTCHA_SESSION_KEY);
-        if (!Objects.equal(code, vercode)) {
+    public MyResult editPost(@Valid MyPost post, BindingResult bindingResult, String vercode, String codetoken) {
+        String code = redisService.get(codetoken);
+        if(StringUtils.isBlank(codetoken) || !Objects.equal(code, vercode)) {
             return MyResult.error("验证码错误");
         }
         if (bindingResult.hasErrors()) {

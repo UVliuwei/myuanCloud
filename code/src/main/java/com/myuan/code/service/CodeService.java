@@ -4,6 +4,7 @@ package com.myuan.code.service;
 import com.alibaba.fastjson.JSONObject;
 import com.google.code.kaptcha.Constants;
 import com.google.code.kaptcha.Producer;
+import com.myuan.code.utils.DateUtil;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.UUID;
@@ -25,6 +26,7 @@ public class CodeService {
 
     @Autowired
     private Producer captchaProducer;
+    @Autowired RedisService redisService;
 
     public JSONObject createCode(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session = request.getSession();
@@ -48,7 +50,8 @@ public class CodeService {
         String capText = captchaProducer.createText();
 
         // store the text in the session
-        session.setAttribute(Constants.KAPTCHA_SESSION_KEY, capText);
+        String codeToken = codeToken();
+        redisService.set(codeToken, capText, DateUtil.MINUTE * 10);
 
         // create the image with the text
         try {
@@ -61,7 +64,7 @@ public class CodeService {
             out.close();
             JSONObject object = new JSONObject();
             object.put("img", "data:image/jpeg;base64," + Base64.encodeBase64String(out.toByteArray()));
-            object.put("codeToken", codeToken());
+            object.put("codeToken", codeToken);
             return object;
         } catch (Exception e) {
             e.printStackTrace();

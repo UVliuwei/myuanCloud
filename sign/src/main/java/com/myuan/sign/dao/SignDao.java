@@ -10,6 +10,9 @@ import com.myuan.sign.entity.MySign;
 import java.util.Date;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 
 public interface SignDao extends BaseDao<MySign> {
@@ -19,4 +22,9 @@ public interface SignDao extends BaseDao<MySign> {
     Page<MySign> findByContinueNumGreaterThanAndUpdateDateAfter(int num, Date date, Pageable pageable);
 
     Page<MySign> findByContinueNumGreaterThan(int num, Pageable pageable);
+
+    @Transactional
+    @Modifying
+    @Query("update MySign mysign set mysign.continueNum = ?2 where mysign.id = ?1")
+    void addContinueNum(Long id, Integer continueNum);
 }

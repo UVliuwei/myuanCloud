@@ -50,6 +50,13 @@ public class TokenFilter extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         HttpServletResponse response = ctx.getResponse();
         String token = request.getHeader("token");
+        //是否有管理员角色
+        if("/api/user/roles".equals(request.getRequestURI())) {
+            if(checkRoleUrl(request, token)) {
+                return MyResult.ok("true");
+            }
+            return MyResult.ok("false");
+        }
         MyResult result = AuthUtil.checkAuth(request, token);
         if("1".equals(result.getStatus())) {
             ctx.setRequest(request);
@@ -68,4 +75,16 @@ public class TokenFilter extends ZuulFilter {
         return null;
     }
 
+    private static boolean checkRoleUrl(HttpServletRequest request, String token) {
+
+        if(JWTUtil.verify(token)) {
+            String[] userRoles = JWTUtil.getUserRoles(token);
+            for (String role : userRoles) {
+                if("admin".equals(role) ||"superadmin".equals(role)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

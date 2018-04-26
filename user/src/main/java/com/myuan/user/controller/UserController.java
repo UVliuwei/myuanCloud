@@ -1,19 +1,26 @@
 package com.myuan.user.controller;
 
-import com.google.code.kaptcha.Constants;
 import com.google.common.base.Objects;
 import com.myuan.user.entity.MyResult;
 import com.myuan.user.entity.MyUser;
+import com.myuan.user.service.RedisService;
 import com.myuan.user.service.UserService;
 import com.myuan.user.utils.JWTUtil;
 import com.myuan.user.utils.SaltPasswordUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /*
  * @author liuwei
@@ -27,6 +34,8 @@ public class UserController extends BaseController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private RedisService redisService;
 
     @ApiOperation(value = "获取用户信息", notes = "获取用户信息")
     @GetMapping("/user/{id}")
@@ -116,11 +125,11 @@ public class UserController extends BaseController {
      */
     @PostMapping("user/reg")
     @ApiOperation(value = "用户注册", notes = "用户注册")
-    public MyResult register(@Valid MyUser user, BindingResult bindingResult, String repassword, String vercode, HttpServletRequest request) {
-//        String code = (String) request.getSession().getAttribute(Constants.KAPTCHA_SESSION_KEY);
-//        if(!Objects.equal(code, vercode)) {
-//            return MyResult.error("验证码错误");
-//        }
+    public MyResult register(@Valid MyUser user, BindingResult bindingResult, String repassword, String vercode, String codetoken) {
+        String code = redisService.get(codetoken);
+        if(StringUtils.isBlank(codetoken) || !Objects.equal(code, vercode)) {
+            return MyResult.error("验证码错误");
+        }
         if (bindingResult.hasErrors()) {
             return validForm(bindingResult);
         }

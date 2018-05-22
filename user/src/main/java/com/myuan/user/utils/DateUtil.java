@@ -80,4 +80,16 @@ public class DateUtil {
         }
         return false;
     }
+
+    //日期转换
+    public static Date string2Date(String time) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            Date date = simpleDateFormat.parse(time);
+            return date;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

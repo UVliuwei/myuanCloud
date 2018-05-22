@@ -7,6 +7,8 @@ package com.myuan.user.dao;
 
 import com.myuan.user.entity.MyUser;
 import java.util.Date;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -40,4 +42,7 @@ public interface UserDao extends BaseDao<MyUser> {
     @Transactional
     @Query("update MyUser user set user.kiss = user.kiss + ?2 where user.id = ?1")
     void addUserKiss(Long id, Integer kiss);
+
+    Page<MyUser> findAllByCreateDateBetweenAndNameLike(Pageable pageable, Date start, Date end, String name);
+
 }

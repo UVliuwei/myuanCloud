@@ -1,16 +1,23 @@
 package com.myuan.user.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.myuan.user.client.SignRemoteClient;
 import com.myuan.user.client.ZanRemoteClient;
 import com.myuan.user.dao.UserDao;
 import com.myuan.user.entity.MyResult;
 import com.myuan.user.entity.MyUser;
+import com.myuan.user.utils.DateUtil;
 import com.myuan.user.utils.IDUtil;
 import com.myuan.user.utils.SaltPasswordUtil;
 import java.util.Date;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,7 +93,7 @@ public class UserService {
     @Transactional
     public MyResult updateUserImg(Long id, String img) {
         userDao.updateMyUserImg(id, img);
-        return MyResult.ok("");
+        return MyResult.ok("上传成功");
     }
 
     /**
@@ -137,4 +144,28 @@ public class UserService {
 //        }
 //        return mailService.sendSimpleMail(email, user.getName(), IDUtil.code());
 //    }
+
+    /**
+     * <liuwei> [2018/4/26 18:00] 所有用户 (admin)
+     */
+    public JSONObject findAllUsers(Integer page, Integer limit, String start, String end, String name) {
+        JSONObject object = new JSONObject();
+        Sort sort = new Sort(Direction.DESC, "createDate");
+        Pageable pageable = new PageRequest(page - 1, limit, sort);
+        Date startDate = DateUtil.string2Date(start);
+        Date ebdDate = DateUtil.string2Date(end);
+        if (startDate == null || ebdDate == null || ebdDate.before(startDate)) {
+            object.put("code", "-1");
+            object.put("msg", "日期格式错误");
+            object.put("count", "0");
+            object.put("data", null);
+            return object;
+        }
+        Page<MyUser> userPage = userDao.findAllByCreateDateBetweenAndNameLike(pageable, startDate, ebdDate, "%" + name + "%");
+        object.put("code", "0");
+        object.put("msg", "");
+        object.put("count", userPage.getTotalElements() + "");
+        object.put("data", userPage.getContent());
+        return object;
+    }
 }

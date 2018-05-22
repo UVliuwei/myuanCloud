@@ -1,20 +1,18 @@
 package com.myuan.login.controller;
 
-import com.google.code.kaptcha.Constants;
 import com.google.common.base.Objects;
-import com.myuan.login.client.UserRemoteClient;
 import com.myuan.login.entity.MyResult;
 import com.myuan.login.service.LoginSerivce;
 import com.myuan.login.service.RedisService;
-import com.netflix.discovery.converters.Auto;
+import com.myuan.login.utils.JWTUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,9 +45,9 @@ public class LoginController {
         return loginSerivce.login(email, password);
     }
 
-    @PostMapping("logout")
-    @ApiOperation(value = "退出登录", notes = "退出登录")
-    public MyResult logout() {
-        return MyResult.ok("");
+    @GetMapping("info")
+    @ApiOperation(value = "登陆信息", notes = "登陆信息")
+    public MyResult loginInfo(@RequestHeader("token") String token) {
+        return loginSerivce.loginInfo(JWTUtil.getUserId(token));
     }
 }

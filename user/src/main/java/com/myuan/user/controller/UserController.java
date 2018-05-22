@@ -46,6 +46,11 @@ public class UserController extends BaseController {
         }
         return user;
     }
+    @ApiOperation(value = "获取用户信息", notes = "获取用户信息")
+    @GetMapping("/user/{id}/info")
+    public MyUser getUserINfo(@PathVariable("id") Long id) {
+        return getUser(id);
+    }
     @ApiOperation(value = "获取个人信息", notes = "获取个人信息")
     @GetMapping("/user")
     public MyUser getUserSelf(@RequestHeader("token") String token) {
@@ -139,6 +144,14 @@ public class UserController extends BaseController {
         user.setPassword(SaltPasswordUtil.getNewPass(user.getPassword()));
         MyResult result = userService.saveUser(user);
         return result;
+    }
+    /**
+     * 修改头像 <liuwei> [2018/5/13 9:00]
+     */
+    @PutMapping("user/img")
+    @ApiOperation(value = "修改头像", notes = "修改头像")
+    public MyResult editImg(Long id, String imgName) {
+        return userService.updateUserImg(id, imgName);
     }
 
 }

@@ -34,8 +34,8 @@ public class CollectionService {
     @Autowired
     private PostRemoteClient postRemoteClient;
 
-    public MyCollection findCollection(Long userId, Long postId) {
-        return collectionDao.findByUserIdAndPostId(userId, postId);
+    public MyResult findCollection(Long userId, Long postId) {
+        return collectionDao.findByUserIdAndPostId(userId, postId) == null ? MyResult.data("false") : MyResult.data("true");
     }
 
     public MyResult addCollection(Long userId, Long postId) {
@@ -46,6 +46,7 @@ public class CollectionService {
         collectionDao.save(collection);
         return MyResult.ok("");
     }
+
     public MyResult deleteCollection(Long userId, Long postId) {
         collectionDao.deleteByUserIdAndPostId(userId, postId);
         return MyResult.ok("");

@@ -3,6 +3,7 @@ package com.myuan.answer.controller;
 import com.myuan.answer.entity.MyAnswer;
 import com.myuan.answer.entity.MyPage;
 import com.myuan.answer.entity.MyResult;
+import com.myuan.answer.entity.PostAnswer;
 import com.myuan.answer.service.AnswerService;
 import com.myuan.answer.entity.UserAnswer;
 import com.myuan.answer.utils.JWTUtil;
@@ -71,8 +72,8 @@ public class AnswerController {
 
     @ApiOperation(value = "获取用户回答", notes = "获取用户回答")
     @GetMapping("answer/user/{userid}/answers")
-    public List<MyAnswer> getUserAnswer(@RequestHeader("token") String token) {
-        return answerService.findUserAnswers(JWTUtil.getUserId(token));
+    public List<PostAnswer> getUserAnswer(@PathVariable("userid") Long userid) {
+        return answerService.findUserAnswers(userid);
     }
 
     @ApiOperation(value = "删除消息", notes = "删除消息")

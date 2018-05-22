@@ -63,7 +63,7 @@ public class AnswerService {
         String reg = "@.*";
         boolean matches = Pattern.matches(reg, strings[0]);
         String html = "<li><div class=\"detail-about detail-about-reply\"><a class=\"fly-avatar\" href=\"/user/" + user.getId()
-            + "/info\" target=\"_blank\"><img src=\"/images/" + user.getImg() + "\" alt=\"" + user.getName()
+            + "/info\" target=\"_blank\"><img src=\"/static/images/" + user.getImg() + "\" alt=\"" + user.getName()
             + "\"></a><div class=\"fly-detail-user\"><a href=\"/user/" + user.getId() + "/info\" target=\"_blank\" class=\"fly-link\"><cite>"
             + user.getName()
             + "</cite></a></div><div class=\"detail-hits\"><span>刚刚</span></div></div><div id='ahtml' class=\"detail-body jieda-body photos\">"
@@ -158,10 +158,18 @@ public class AnswerService {
     /**
      * <liuwei> [2018/2/26 8:36] 用户回答
      */
-    public List<MyAnswer> findUserAnswers(Long userId) {
+    public List<PostAnswer> findUserAnswers(Long userId) {
         Sort sort = new Sort(Direction.ASC, "createDate");
-        Pageable pageable = new PageRequest(0, 12, sort);
-        return answerDao.findMyAnswersByUserId(userId, pageable).getContent();
+        Pageable pageable = new PageRequest(0, 8, sort);
+        List<MyAnswer> content = answerDao.findMyAnswersByUserId(userId, pageable).getContent();
+        List<PostAnswer> list = Lists.newArrayList();
+        for (MyAnswer answer : content) {
+            PostAnswer postAnswer = new PostAnswer();
+            postAnswer.setPost(postRemoteClient.getPostById(answer.getPostId()));
+            postAnswer.setAnswer(answer);
+            list.add(postAnswer);
+        }
+        return list;
     }
 
     public MyAnswer findAnswerById(Long id) {

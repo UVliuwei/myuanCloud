@@ -9,11 +9,13 @@ import com.myuan.post.entity.MyResult;
 import com.myuan.post.entity.UserPost;
 import com.myuan.post.service.PostService;
 import com.myuan.post.service.RedisService;
+import com.myuan.post.utils.JWTUtil;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import net.bytebuddy.asm.Advice.Return;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +47,7 @@ public class PostController extends BaseController {
 
     @PostMapping("post")
     @ApiOperation(value = "发表求解", notes = "发表求解")
-    public MyResult addPost(@Valid MyPost post, BindingResult bindingResult, String vercode, String codetoken) {
+    public MyResult addPost(@Valid MyPost post, BindingResult bindingResult, String vercode, String codetoken, @RequestHeader("token") String token) {
         String code = redisService.get(codetoken);
         if(StringUtils.isBlank(codetoken) || !Objects.equal(code, vercode)) {
             return MyResult.error("验证码错误");
@@ -52,6 +55,7 @@ public class PostController extends BaseController {
         if (bindingResult.hasErrors()) {
             return validForm(bindingResult);
         }
+        post.setUserId(JWTUtil.getUserId(token));
         MyResult result = postService.savePost(post);
         return result;
     }

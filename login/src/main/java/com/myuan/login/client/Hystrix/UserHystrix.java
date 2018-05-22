@@ -16,4 +16,9 @@ public class UserHystrix implements UserRemoteClient{
     public MyUser getUserByEmail(String email) {
         return null;
     }
+
+    @Override
+    public MyUser getUser(Long id) {
+        return null;
+    }
 }

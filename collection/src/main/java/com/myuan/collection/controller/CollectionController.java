@@ -30,7 +30,7 @@ public class CollectionController {
 
     @GetMapping("collection/post/{cid}/user/{uid}")
     @ApiOperation(value = "获取用户收藏", notes = "获取用户收藏")
-    public MyCollection findCollection(@PathVariable("uid") Long uid, @PathVariable("cid") Long cid) {
+    public MyResult findCollection(@PathVariable("uid") Long uid, @PathVariable("cid") Long cid) {
         return collectionService.findCollection(uid, cid);
     }
 

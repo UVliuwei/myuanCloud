@@ -6,12 +6,8 @@ package com.myuan.user.controller;
  */
 
 import com.myuan.user.entity.MyResult;
-import com.myuan.user.entity.MyUser;
 import java.beans.PropertyEditorSupport;
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -26,14 +22,6 @@ public class BaseController {
         return MyResult.error(message);
     }
 
-    /**
-     * shiro session <liuwei> [2018/1/28 11:48]
-     */
-    public void setUserSession(MyUser user) {
-        Subject subject = SecurityUtils.getSubject();
-        Session session = subject.getSession(true);
-        session.setAttribute("user", user);
-    }
     /**
      *  xss预防 <liuwei> [2018/2/27 9:00]
      */

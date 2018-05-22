@@ -15,6 +15,11 @@ public class MyResult {
     private String msg;
     private Object data;
 
+
+    //必须有空的构造方法，否则报错
+    public MyResult() { }
+
+
     public MyResult(String status, String msg, Object data) {
         this.status = status;
         this.msg = msg;

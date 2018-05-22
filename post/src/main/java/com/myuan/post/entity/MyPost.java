@@ -26,7 +26,6 @@ public class MyPost extends BaseEntity implements Serializable {
     @Column(updatable = false)
     //自增长主键
     private Long id;
-    @NotNull
     @Column(updatable = false)
     private Long userId;
 

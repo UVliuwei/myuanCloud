@@ -70,10 +70,10 @@ public class DateUtil {
     // 是否是昨天
     public static final boolean checkDay(Date date) {
         Calendar calendar = new GregorianCalendar();
-        calendar.setTime(new Date());
-        calendar.set(Calendar.DATE, -1);
-        int n = calendar.get(Calendar.DATE);
         calendar.setTime(date);
+        calendar.add(Calendar.DATE, 1);
+        int n = calendar.get(Calendar.DATE);
+        calendar.setTime(new Date());
         int l = calendar.get(Calendar.DATE);
         if(n == l) {
             return true;

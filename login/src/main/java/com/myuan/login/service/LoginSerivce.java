@@ -1,6 +1,7 @@
 package com.myuan.login.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.myuan.login.client.UserRemoteClient;
 import com.myuan.login.entity.MyResult;
@@ -29,6 +30,7 @@ public class LoginSerivce {
     RoleService roleService;
     @Autowired
     UserRemoteClient userRemoteClient;
+
     @Transactional(rollbackFor = Exception.class)
     public MyResult login(String email, String password) {
         MyUser user = userRemoteClient.getUserByEmail(email);
@@ -38,15 +40,34 @@ public class LoginSerivce {
         if("1".equals(user.getLocked())) {
             return MyResult.error("账号已被锁定,禁止登录");
         }
-        List<MyRole> roles = roleService.findRoleByUserId(user.getId());
-        String token = JWTUtil.createToken(user.getId(), roles.toArray(new String[0]));
-        JSONObject object = new JSONObject();
-        object.put("name", user.getName());
-        object.put("img", user.getImg());
-        object.put("id", user.getId().toString());
+        return createLoginInfo(user.getId());
+    }
+
+    public MyResult loginInfo(Long id) {
+        return createLoginInfo(id);
+    }
+
+    //登陆信息 <liuwei> [2018/5/17 16:25]
+    private MyResult createLoginInfo(Long id) {
+        MyUser user = userRemoteClient.getUser(id);
+        List<String> roleList = Lists.newArrayList();
+        List<MyRole> roles = roleService.findRoleByUserId(id);
+        for (MyRole role : roles) {
+            roleList.add(role.getType());
+        }
+        String token = JWTUtil.createToken(id, roleList.toArray(new String[0]));
         Map<String, Object> map = new HashMap<>();
         map.put("token", token);
-        map.put("info", object);
+        user.setPassword("");
+        map.put("info", user);
+        //是否是管理员
+        String roleFlag = "false";
+        for (String role : roleList) {
+            if("admin".equals(role) || "superadmin".equals(role)) {
+                roleFlag = "true";
+            }
+        }
+        map.put("isAdmin", roleFlag);
         return MyResult.data(map);
     }
 }

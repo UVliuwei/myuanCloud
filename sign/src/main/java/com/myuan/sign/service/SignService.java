@@ -15,6 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  *  签到业务层
  */
 @Service
+@Log4j
 public class SignService {
 
     @Autowired
@@ -53,13 +55,14 @@ public class SignService {
             kiss = 5;
         } else {
             if (DateUtil.checkDay(sign.getUpdateDate())) {
-                signDao.addContinueNum(sign.getId(), sign.getContinueNum() + 1);
+                sign.setContinueNum(sign.getContinueNum() + 1);
             } else {
-                signDao.addContinueNum(sign.getId(), 1);
+                sign.setContinueNum(1);
             }
             kiss = SwitchUtil.switchDayKiss(sign.getContinueNum());
             MyResult result = userRemoteClient.addKiss(userId, kiss);
-            if("-1".equals(result)) {
+            log.info("sign:" + result);
+            if("-1".equals(result.getStatus())) {
                 throw new RuntimeException();
             }
         }

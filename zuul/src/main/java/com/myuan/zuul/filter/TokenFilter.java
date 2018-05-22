@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -50,14 +52,9 @@ public class TokenFilter extends ZuulFilter {
         HttpServletRequest request = ctx.getRequest();
         HttpServletResponse response = ctx.getResponse();
         String token = request.getHeader("token");
-        //是否有管理员角色
-        if("/api/user/roles".equals(request.getRequestURI())) {
-            if(checkRoleUrl(request, token)) {
-                return MyResult.ok("true");
-            }
-            return MyResult.ok("false");
-        }
-        MyResult result = AuthUtil.checkAuth(request, token);
+        MyResult result = null;
+
+        result = AuthUtil.checkAuth(request, token);
         if("1".equals(result.getStatus())) {
             ctx.setRequest(request);
             ctx.setSendZuulResponse(true); //进行路由
@@ -75,16 +72,4 @@ public class TokenFilter extends ZuulFilter {
         return null;
     }
 
-    private static boolean checkRoleUrl(HttpServletRequest request, String token) {
-
-        if(JWTUtil.verify(token)) {
-            String[] userRoles = JWTUtil.getUserRoles(token);
-            for (String role : userRoles) {
-                if("admin".equals(role) ||"superadmin".equals(role)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }

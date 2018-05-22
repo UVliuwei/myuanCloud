@@ -12,5 +12,4 @@ public class EurekaApplicationTests {
 	@Test
 	public void contextLoads() {
 	}
-
 }
